@@ -1,0 +1,21 @@
+name: Build My Tweak
+on: 
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: 下载我的代码
+        uses: actions/checkout@v3
+
+      - name: 配置编译环境 (Theos)
+        uses: theos/theos-action@v1
+
+      - name: 提取生成的 dylib 插件
+        uses: actions/upload-artifact@v3
+        with:
+          name: MyTweak-Dylib
+          path: .theos/obj/debug/*.dylib
