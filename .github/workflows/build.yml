@@ -11,9 +11,12 @@ jobs:
       - name: 1. 下载我的代码
         uses: actions/checkout@v4
 
-      - name: 2. 安装正宗 Theos 编译环境与 iOS SDK
+      - name: 2. 强力安装环境 (绕过 API 限制)
         run: |
-          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          brew install ldid
+          # 直接克隆 Theos 核心文件，不使用会报错的官方脚本
+          git clone --recursive https://github.com/theos/theos.git ~/theos
+          # 手动下载并配置 SDK
           curl -LO https://github.com/theos/sdks/releases/latest/download/iPhoneOS14.5.sdk.tar.xz
           tar -xf iPhoneOS14.5.sdk.tar.xz
           mv iPhoneOS14.5.sdk ~/theos/sdks/
@@ -24,7 +27,7 @@ jobs:
           export THEOS=~/theos
           make
 
-      - name: 4. 提取生成的 dylib 插件 (升级到 v4)
+      - name: 4. 提取生成的 dylib 插件
         uses: actions/upload-artifact@v4
         with:
           name: MyTweak-Dylib
