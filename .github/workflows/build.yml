@@ -8,14 +8,24 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - name: 下载我的代码
-        uses: actions/checkout@v3
+      - name: 1. 下载我的代码
+        uses: actions/checkout@v4
 
-      - name: 配置编译环境 (Theos)
-        uses: theos/theos-action@v1
+      - name: 2. 安装正宗 Theos 编译环境与 iOS SDK
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          curl -LO https://github.com/theos/sdks/releases/latest/download/iPhoneOS14.5.sdk.tar.xz
+          tar -xf iPhoneOS14.5.sdk.tar.xz
+          mv iPhoneOS14.5.sdk ~/theos/sdks/
+          rm iPhoneOS14.5.sdk.tar.xz
 
-      - name: 提取生成的 dylib 插件
-        uses: actions/upload-artifact@v3
+      - name: 3. 开始编译插件
+        run: |
+          export THEOS=~/theos
+          make
+
+      - name: 4. 提取生成的 dylib 插件 (升级到 v4)
+        uses: actions/upload-artifact@v4
         with:
           name: MyTweak-Dylib
           path: .theos/obj/debug/*.dylib
